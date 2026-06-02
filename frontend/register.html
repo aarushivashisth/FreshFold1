@@ -1,0 +1,133 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>FreshFold - Sign Up</title>
+  <style>
+    body {
+      margin: 0;
+      font-family: "Segoe UI", sans-serif;
+      background: url("Cream and Brown Photographic Beauty Site Launch Website.png") no-repeat center center/cover;
+      background-size: cover;
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      height: 100vh;
+      color: #5a3a32;
+    }
+
+    .signup-box {
+      background: rgba(255, 255, 255, 0.85);
+      padding: 40px;
+      border-radius: 12px;
+      box-shadow: 0 5px 15px rgba(0,0,0,0.2);
+      text-align: center;
+      width: 340px;
+    }
+
+    .signup-box h2 {
+      margin-bottom: 20px;
+      font-size: 24px;
+      color: #3c2620;
+      font-weight: bold;
+    }
+
+    .signup-box input {
+      width: 100%;
+      padding: 12px;
+      margin: 10px 0;
+      border-radius: 8px;
+      border: 1px solid #ccc;
+      outline: none;
+      font-size: 14px;
+    }
+
+    .signup-box input:focus {
+      border-color: #a67c68;
+      box-shadow: 0 0 5px #a67c68;
+    }
+
+    .signup-box button {
+      width: 100%;
+      padding: 12px;
+      margin-top: 10px;
+      background: #5a3a32;
+      color: white;
+      border: none;
+      border-radius: 25px;
+      font-size: 16px;
+      font-weight: bold;
+      cursor: pointer;
+      transition: background 0.3s, transform 0.3s;
+    }
+
+    .signup-box button:hover {
+      background: #3c2620;
+      transform: scale(1.05);
+    }
+
+    .signup-box p {
+      margin-top: 15px;
+      font-size: 14px;
+    }
+
+    .signup-box a {
+      color: #5a3a32;
+      text-decoration: none;
+      font-weight: bold;
+    }
+
+    .signup-box a:hover {
+      color: #3c2620;
+    }
+  </style>
+</head>
+<body>
+
+  <div class="signup-box">
+    <h2>Create Account</h2>
+    <form onsubmit="return registerUser()">
+      <input type="text" id="username" placeholder="Username">
+<input type="email" id="email" placeholder="Email">
+<input type="text" id="name" placeholder="Full Name">
+<input type="password" id="password" placeholder="Password">
+<input type="text" id="phone" placeholder="Phone">
+<input type="text" id="address" placeholder="Address">
+<button type="button" onclick="registerUser()">Sign Up</button>
+
+    </form>
+    <p>Already have an account? <a href="login.html">Login here</a></p>
+  </div>
+
+  <script>
+async function registerUser() {
+  const name = document.getElementById("name").value;
+  const email = document.getElementById("email").value;
+  const username = document.getElementById("username").value;
+  const password = document.getElementById("password").value;
+  const phone = document.getElementById("phone").value;
+  const address = document.getElementById("address").value;
+
+  const res = await fetch("http://localhost:5000/api/users/register", {
+    method: "POST",
+    headers: {"Content-Type": "application/json"},
+    body: JSON.stringify({ name, email, username, password, phone, address })
+  });
+
+  const data = await res.json();
+
+  if (!res.ok) {
+    alert(data.error || "Registration failed");
+    return false;
+  }
+
+  alert("✅ Account created successfully! Please login.");
+  window.location.href = "login.html";
+  return false;
+}
+</script>
+
+
+</body>
+</html>

@@ -1,0 +1,152 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>FreshFold | Order Receipt</title>
+
+  <style>
+    body {
+      font-family: "Courier New", monospace;
+      background: url("Cream and Brown Photographic Beauty Site Launch Website.png") no-repeat center/cover;
+      color: #3c2620;
+      padding: 50px;
+    }
+    .receipt {
+      max-width: 700px;
+      margin: auto;
+      background: rgba(255,255,255,0.9);
+      border-radius: 15px;
+      padding: 30px;
+      box-shadow: 0 5px 15px rgba(0,0,0,0.15);
+    }
+    h2 {
+      text-align: center;
+      font-family: "Playfair Display", serif;
+    }
+    table { width: 100%; border-collapse: collapse; }
+    th, td { padding: 10px; border-bottom: 1px solid #ccc; }
+    .totals { text-align: right; font-weight: bold; line-height: 1.8; }
+    button {
+      display: block; margin: 25px auto 0;
+      background: #5a3a32; color: white;
+      border: none; border-radius: 25px;
+      padding: 12px 25px; font-size: 16px;
+      cursor: pointer; transition: 0.3s;
+    }
+    button:hover { background: #3c2620; transform: scale(1.05); }
+  </style>
+</head>
+
+<body>
+
+<div class="receipt">
+  <h2>Order Receipt</h2>
+
+  <table>
+    <thead>
+      <tr>
+        <th>Item Type</th>
+        <th>Qty</th>
+        <th>Service</th>
+        <th>Amount</th>
+      </tr>
+    </thead>
+    <tbody id="billRows"></tbody>
+  </table>
+
+  <div class="totals" id="totals"></div>
+
+  <button onclick="placeOrder()">Place Order</button>
+</div>
+
+
+<script>
+// ✅ Fetch Order From LocalStorage
+const order = JSON.parse(localStorage.getItem("freshFoldOrder")) || [];
+
+// ✅ Map UI services → DB service table IDs
+const serviceMap = {
+  "Cotton Wear": 1,
+  "Silk & Delicate Wear": 2,
+  "Denim & Heavy Garments": 3,
+  "Woolens & Winter Wear": 4
+};
+
+let subtotal = 0;
+let rows = "";
+let itemsForDB = [];
+
+order.forEach(item => {
+  const count = item.services.length || 1;
+  const amount = item.qty * item.rate * count;
+  subtotal += amount;
+
+  rows += `
+    <tr>
+      <td>${item.type}</td>
+      <td>${item.qty}</td>
+      <td>${item.services.join(", ")}</td>
+      <td>₹${amount}</td>
+    </tr>`;
+
+  itemsForDB.push({
+  type: item.type,
+  qty: item.qty,
+  services: item.services,
+  rate: item.rate
+});
+
+});
+
+const gst = subtotal * 0.05;
+const delivery = 30;
+const total = subtotal + gst + delivery;
+
+// ✅ Render Bill UI
+document.getElementById("billRows").innerHTML = rows;
+document.getElementById("totals").innerHTML = `
+  Subtotal: ₹${subtotal.toFixed(2)}<br>
+  GST (5%): ₹${gst.toFixed(2)}<br>
+  Delivery: ₹${delivery.toFixed(2)}<br>
+  <strong>Total: ₹${total.toFixed(2)}</strong>
+`;
+
+
+// ✅ Place Order Backend API
+async function placeOrder() {
+
+  const userId = localStorage.getItem("userId");
+  if (!userId) {
+    alert("⚠ Please log in first!");
+    return window.location.href = "login.html";
+  }
+
+  const res = await fetch("http://localhost:5000/api/orders/create", {
+    method: "POST",
+    headers: { "Content-Type": "application/json" },
+    body: JSON.stringify({
+      user_id: userId,
+      items: itemsForDB,
+      payment_mode: "COD",
+      pickup_slot: "Evening - 6PM"
+    })
+  });
+
+  const data = await res.json();
+  if (!res.ok) {
+    return alert(data.error || "Order failed!");
+  }
+
+  alert("✅ Order Placed Successfully!");
+
+  localStorage.setItem("lastOrderId", data.orderId);
+  localStorage.removeItem("freshFoldOrder");
+
+  window.location.href = "order-status.html";
+}
+
+</script>
+
+</body>
+</html>

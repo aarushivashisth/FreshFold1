@@ -1,0 +1,188 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>FreshFold | Payment</title>
+  <style>
+    body {
+      margin: 0;
+      font-family: "Segoe UI", sans-serif;
+      background: url("Cream and Brown Photographic Beauty Site Launch Website.png") no-repeat center center/cover;
+      background-size: cover;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      height: 100vh;
+      color: #3c2620;
+    }
+
+    .payment-box {
+      background: rgba(255, 255, 255, 0.95);
+      padding: 40px;
+      border-radius: 20px;
+      box-shadow: 0 5px 25px rgba(0,0,0,0.2);
+      width: 90%;
+      max-width: 480px;
+      text-align: center;
+      animation: fadeIn 0.5s ease;
+    }
+
+    h2 {
+      font-family: "Playfair Display", serif;
+      color: #5a3a32;
+      margin-bottom: 15px;
+    }
+
+    p {
+      font-size: 16px;
+      margin-bottom: 20px;
+      color: #3c2620;
+    }
+
+    .payment-options {
+      text-align: left;
+      font-size: 16px;
+      margin-bottom: 20px;
+    }
+
+    .payment-options label {
+      display: block;
+      margin-bottom: 10px;
+    }
+
+    .details-box {
+      margin-top: 15px;
+      text-align: left;
+      animation: fadeIn 0.4s ease;
+    }
+
+    .details-box input {
+      width: 100%;
+      padding: 10px;
+      margin: 8px 0;
+      border: 1px solid #aaa;
+      border-radius: 8px;
+      font-size: 15px;
+    }
+
+    .btn {
+      background: #5a3a32;
+      color: white;
+      border: none;
+      border-radius: 25px;
+      padding: 12px 30px;
+      font-size: 16px;
+      cursor: pointer;
+      transition: background 0.3s, transform 0.2s;
+      margin-top: 20px;
+    }
+
+    .btn:hover {
+      background: #3c2620;
+      transform: scale(1.05);
+    }
+
+    .order-info {
+      margin-bottom: 25px;
+      font-family: "Courier New", monospace;
+      border: 1px dashed #aaa;
+      padding: 10px;
+      border-radius: 10px;
+      background: #fffdf8;
+    }
+
+    @keyframes fadeIn {
+      from { opacity: 0; transform: translateY(20px); }
+      to { opacity: 1; transform: translateY(0); }
+    }
+
+  </style>
+</head>
+<body>
+
+  <div class="payment-box">
+    <h2>Complete Your Payment</h2>
+    <div class="order-info">
+      <p><strong>Total Payable:</strong> ₹<span id="totalAmount">0</span></p>
+    </div>
+
+    <p>Select your preferred payment method:</p>
+
+    <div class="payment-options">
+      <label><input type="radio" name="payment" value="UPI" checked onchange="showDetails()"> UPI (Google Pay, PhonePe, Paytm)</label>
+      <label><input type="radio" name="payment" value="Card" onchange="showDetails()"> Credit / Debit Card</label>
+      <label><input type="radio" name="payment" value="COD" onchange="showDetails()"> Cash on Delivery</label>
+    </div>
+
+    <div id="detailsSection" class="details-box"></div>
+
+    <button class="btn" onclick="processPayment()">Pay Now</button>
+  </div>
+
+  <script>
+    // 🧾 Fetch order data and calculate total
+    const orderData = JSON.parse(localStorage.getItem("freshFoldOrder")) || [];
+    let subtotal = 0;
+    orderData.forEach(item => {
+      const serviceCount = item.services.length || 1;
+      subtotal += item.qty * item.rate * serviceCount;
+    });
+    const gst = subtotal * 0.05;
+    const delivery = 30;
+    const total = subtotal + gst + delivery;
+    document.getElementById("totalAmount").innerText = total.toFixed(2);
+
+    // 🪄 Show payment details depending on selection
+    function showDetails() {
+      const method = document.querySelector('input[name="payment"]:checked').value;
+      const details = document.getElementById("detailsSection");
+      details.innerHTML = ""; // clear old inputs
+
+      if (method === "UPI") {
+        details.innerHTML = `
+          <label>Enter UPI ID:</label>
+          <input type="text" id="upiId" placeholder="example@upi">
+        `;
+      } else if (method === "Card") {
+        details.innerHTML = `
+          <label>Card Number:</label>
+          <input type="text" id="cardNumber" maxlength="16" placeholder="1234 5678 9012 3456">
+          <label>Expiry Date:</label>
+          <input type="month" id="expiryDate">
+          <label>CVV:</label>
+          <input type="password" id="cvv" maxlength="3" placeholder="123">
+        `;
+      } else if (method === "COD") {
+        details.innerHTML = `<p><em>Pay when your order arrives at your doorstep.</em></p>`;
+      }
+    }
+
+    showDetails(); // initialize on page load
+
+    // 🧩 Handle payment process
+    function processPayment() {
+      const method = document.querySelector('input[name="payment"]:checked').value;
+      let valid = true;
+
+      if (method === "UPI") {
+        const upi = document.getElementById("upiId").value.trim();
+        if (!upi) { alert("Please enter your UPI ID."); valid = false; }
+      } else if (method === "Card") {
+        const num = document.getElementById("cardNumber").value.trim();
+        const exp = document.getElementById("expiryDate").value;
+        const cvv = document.getElementById("cvv").value.trim();
+        if (!num || !exp || !cvv) { alert("Please fill all card details."); valid = false; }
+      }
+
+      if (!valid) return;
+
+      alert(`✅ Payment successful via ${method}!`);
+      // redirect to homepage (can later show "Track Order" popup)
+      window.location.href = "home.html";
+    }
+  </script>
+
+</body>
+</html>

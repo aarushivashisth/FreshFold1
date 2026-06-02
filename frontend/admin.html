@@ -1,0 +1,324 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>FreshFold | Admin Dashboard</title>
+  <style>
+    body {
+      margin: 0;
+      font-family: 'Poppins', sans-serif;
+      background: url("Cream and Brown Photographic Beauty Site Launch Website.png") no-repeat center center fixed;
+      background-size: cover;
+      color: #3c2620;
+      min-height: 100vh;
+    }
+
+    /* Header */
+    header {
+      background: rgba(255, 255, 255, 0.85);
+      color: #3c2620;
+      padding: 15px 40px;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      font-family: 'Playfair Display', serif;
+      font-size: 22px;
+      font-weight: bold;
+      backdrop-filter: blur(6px);
+      box-shadow: 0 3px 10px rgba(0,0,0,0.1);
+      position: sticky;
+      top: 0;
+      z-index: 1000;
+    }
+
+    .logout-btn {
+      background: #5a3a32;
+      color: white;
+      border: none;
+      padding: 8px 20px;
+      border-radius: 25px;
+      cursor: pointer;
+      font-weight: 600;
+      font-size: 15px;
+      transition: 0.3s;
+    }
+
+    .logout-btn:hover {
+      background: #3c2620;
+      transform: scale(1.05);
+    }
+
+    /* Navbar */
+    nav {
+      background: rgba(255, 255, 255, 0.85);
+      text-align: center;
+      padding: 10px 0;
+      box-shadow: 0 3px 8px rgba(0,0,0,0.1);
+      backdrop-filter: blur(6px);
+    }
+
+    nav button {
+      background: none;
+      border: 2px solid #5a3a32;
+      color: #5a3a32;
+      font-weight: 600;
+      padding: 8px 18px;
+      margin: 0 10px;
+      border-radius: 25px;
+      cursor: pointer;
+      transition: all 0.3s;
+      font-family: 'Poppins', sans-serif;
+    }
+
+    nav button:hover, nav button.active {
+      background: #5a3a32;
+      color: white;
+      transform: scale(1.05);
+    }
+
+    /* Sections */
+    section {
+      display: none;
+      padding: 30px;
+      text-align: center;
+      animation: fadeIn 0.4s ease;
+    }
+
+    section.active {
+      display: block;
+    }
+
+    @keyframes fadeIn {
+      from { opacity: 0; transform: translateY(10px); }
+      to { opacity: 1; transform: translateY(0); }
+    }
+
+    /* Tables */
+    table {
+      width: 90%;
+      margin: 30px auto;
+      border-collapse: collapse;
+      background: rgba(255,255,255,0.9);
+      border-radius: 15px;
+      overflow: hidden;
+      box-shadow: 0 6px 20px rgba(0,0,0,0.1);
+    }
+
+    th, td {
+      text-align: center;
+      padding: 14px;
+      border-bottom: 1px solid #ddd;
+      color: #3c2620;
+      font-size: 15px;
+    }
+
+    th {
+      background: #5a3a32;
+      color: white;
+      font-family: 'Playfair Display', serif;
+      font-size: 16px;
+    }
+
+    tr:hover {
+      background: rgba(90, 58, 50, 0.05);
+    }
+
+    select, button {
+      padding: 6px 10px;
+      border-radius: 8px;
+      border: 1px solid #ccc;
+      background: #fffaf5;
+      color: #3c2620;
+    }
+
+    button.update-btn {
+      background: #5a3a32;
+      color: white;
+      border: none;
+      border-radius: 20px;
+      padding: 6px 14px;
+      cursor: pointer;
+      transition: 0.3s;
+    }
+
+    button.update-btn:hover {
+      background: #3c2620;
+      transform: scale(1.05);
+    }
+
+    /* Footer */
+    footer {
+      text-align: center;
+      background: rgba(255, 255, 255, 0.85);
+      color: #3c2620;
+      padding: 10px;
+      font-size: 14px;
+      position: fixed;
+      bottom: 0;
+      width: 100%;
+      backdrop-filter: blur(4px);
+      box-shadow: 0 -2px 8px rgba(0,0,0,0.05);
+      font-family: 'Playfair Display', serif;
+    }
+
+  </style>
+</head>
+<body>
+  <header>
+    <h2>FreshFold Admin Panel</h2>
+    <button class="logout-btn" onclick="logout()">Logout</button>
+  </header>
+
+  <nav>
+    <button id="tabOrders" class="active" onclick="showTab('orders')">Orders</button>
+    <button id="tabFeedbacks" onclick="showTab('feedbacks')">Feedbacks</button>
+  </nav>
+
+  <!-- ORDERS TAB -->
+  <section id="orders" class="active">
+    <h3 style="font-family:'Playfair Display',serif;font-size:28px;">Customer Orders</h3>
+    <table>
+      <thead>
+        <tr>
+          <th>Order ID</th>
+          <th>Customer</th>
+          <th>Total (₹)</th>
+          <th>Status</th>
+          <th>Payment</th>
+          <th>Pickup Slot</th>
+          <th>Update</th>
+        </tr>
+      </thead>
+      <tbody id="orderTable">
+        <tr><td colspan="7">Loading orders...</td></tr>
+      </tbody>
+    </table>
+  </section>
+
+  <!-- FEEDBACK TAB -->
+  <section id="feedbacks">
+    <h3 style="font-family:'Playfair Display',serif;font-size:28px;">Customer Feedbacks</h3>
+    <table>
+      <thead>
+        <tr>
+          <th>Feedback ID</th>
+          <th>Customer</th>
+          <th>Order ID</th>
+          <th>Message</th>
+          <th>Rating</th>
+        </tr>
+      </thead>
+      <tbody id="feedbackTable">
+        <tr><td colspan="5">Loading feedbacks...</td></tr>
+      </tbody>
+    </table>
+  </section>
+
+  <footer>© 2025 FreshFold Admin Dashboard</footer>
+
+  <script>
+    // NAVIGATION
+    function showTab(tab) {
+      document.querySelectorAll("section").forEach(sec => sec.classList.remove("active"));
+      document.querySelectorAll("nav button").forEach(btn => btn.classList.remove("active"));
+      document.getElementById(tab).classList.add("active");
+      document.getElementById("tab" + tab.charAt(0).toUpperCase() + tab.slice(1)).classList.add("active");
+
+      if (tab === "orders") loadOrders();
+      if (tab === "feedbacks") loadFeedbacks();
+    }
+
+    // LOAD ORDERS
+    async function loadOrders() {
+      const res = await fetch("http://localhost:5000/api/orders");
+      const orders = await res.json();
+      const table = document.getElementById("orderTable");
+      table.innerHTML = orders.map(o => `
+        <tr>
+          <td>${o.id}</td>
+          <td>${o.customer_name || 'N/A'}</td>
+          <td>${o.total_amount}</td>
+          <td>
+            <select id="st_${o.id}">
+              <option ${o.status=='placed'?'selected':''}>placed</option>
+              <option ${o.status=='pickup_scheduled'?'selected':''}>pickup_scheduled</option>
+              <option ${o.status=='picked'?'selected':''}>picked</option>
+              <option ${o.status=='in_process'?'selected':''}>in_process</option>
+              <option ${o.status=='ready'?'selected':''}>ready</option>
+              <option ${o.status=='out_for_delivery'?'selected':''}>out_for_delivery</option>
+              <option ${o.status=='delivered'?'selected':''}>delivered</option>
+              <option ${o.status=='cancelled'?'selected':''}>cancelled</option>
+            </select>
+          </td>
+          <td>${o.payment_mode}</td>
+          <td>${o.pickup_slot || 'N/A'}</td>
+          <td><button class="update-btn" onclick="updateStatus(${o.id})">Save</button></td>
+        </tr>
+      `).join("");
+    }
+
+    // UPDATE ORDER STATUS
+    async function updateStatus(id) {
+  const newStatus = document.getElementById(`st_${id}`).value;
+
+  // map labels to step number
+  const statusSteps = {
+    placed: 0,
+    pickup_scheduled: 1,
+    picked: 2,
+    in_process: 3,
+    ready: 4,
+    out_for_delivery: 5,
+    delivered: 6
+  };
+
+  const res = await fetch(`http://localhost:5000/api/orders/update-status/${id}`, {
+    method: "PUT",
+    headers: { "Content-Type": "application/json" },
+    body: JSON.stringify({
+      status: newStatus,
+      step: statusSteps[newStatus] || 0
+    })
+  });
+
+  const data = await res.json();
+  if (res.ok) {
+    alert(`✅ Order #${id} Updated`);
+    loadOrders();
+  } else {
+    alert("Failed");
+  }
+}
+
+
+    // LOAD FEEDBACKS
+    async function loadFeedbacks() {
+      const res = await fetch("http://localhost:5000/api/feedback/all");
+      const feedbacks = await res.json();
+      const table = document.getElementById("feedbackTable");
+      table.innerHTML = feedbacks.map(f => `
+        <tr>
+          <td>${f.id}</td>
+          <td>${f.user_name || 'N/A'}</td>
+          <td>${f.order_id}</td>
+          <td>${f.message}</td>
+          <td>${f.rating || '-'}</td>
+        </tr>
+      `).join("");
+    }
+
+    // LOGOUT
+    function logout() {
+  localStorage.removeItem("userId");
+  localStorage.removeItem("role");
+  localStorage.removeItem("username");
+  window.location.href = "login.html";
+}
+
+
+    // INIT
+    loadOrders();
+  </script>
+</body>
+</html>
